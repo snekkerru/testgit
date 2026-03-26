@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blob.io – Eat, Grow, Dominate</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #00e5ff;
+      --accent: #ff4081;
+      --bg: #0a0a1a;
+      --surface: #12122a;
+      --text: #e0e0e0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── Animated Background ── */
+    .bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.15;
+      animation: float linear infinite;
+    }
+
+    @keyframes float {
+      0%   { transform: translateY(110vh) scale(1); }
+      100% { transform: translateY(-20vh) scale(1.2); }
+    }
+
+    /* ── Layout ── */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      background: rgba(10, 10, 26, 0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0, 229, 255, 0.12);
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 900;
+      letter-spacing: -1px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      margin-left: 32px;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--primary); }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      padding: 80px 0 40px;
+    }
+
+    .hero-content {
+      max-width: 600px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(0, 229, 255, 0.12);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 24px;
+    }
+
+    h1 span {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: #9e9ec0;
+      line-height: 1.7;
+      margin-bottom: 40px;
+      max-width: 480px;
+    }
+
+    .cta-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 16px 36px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 229, 255, 0.3);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #0090a8);
+      color: #000;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid rgba(0, 229, 255, 0.4);
+      color: var(--primary);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--primary);
+      box-shadow: 0 8px 30px rgba(0, 229, 255, 0.15);
+    }
+
+    /* ── Stats ── */
+    .stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 60px;
+      flex-wrap: wrap;
+    }
+
+    .stat-item strong {
+      display: block;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--primary);
+    }
+
+    .stat-item span {
+      font-size: 0.85rem;
+      color: #6060a0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ── Features ── */
+    .features {
+      padding: 100px 0;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+
+    .section-sub {
+      text-align: center;
+      color: #6060a0;
+      margin-bottom: 64px;
+      font-size: 1.05rem;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      padding: 32px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0, 229, 255, 0.25);
+    }
+
+    .feature-icon {
+      font-size: 2.4rem;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .feature-card p {
+      color: #7070a0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* ── How to Play ── */
+    .how-to-play {
+      padding: 80px 0 100px;
+      background: var(--surface);
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 32px;
+      margin-top: 60px;
+    }
+
+    .step {
+      text-align: center;
+    }
+
+    .step-num {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #0090a8);
+      color: #000;
+      font-size: 1.4rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+
+    .step h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .step p {
+      color: #7070a0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* ── Leaderboard Preview ── */
+    .leaderboard-section {
+      padding: 100px 0;
+    }
+
+    .leaderboard {
+      background: var(--surface);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      overflow: hidden;
+      max-width: 600px;
+      margin: 48px auto 0;
+    }
+
+    .lb-header {
+      background: rgba(0, 229, 255, 0.08);
+      padding: 16px 24px;
+      display: grid;
+      grid-template-columns: 40px 1fr 80px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .lb-row {
+      display: grid;
+      grid-template-columns: 40px 1fr 80px;
+      padding: 14px 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      align-items: center;
+      transition: background 0.15s;
+    }
+
+    .lb-row:hover { background: rgba(255,255,255,0.03); }
+
+    .lb-rank {
+      font-weight: 700;
+      color: #4040a0;
+    }
+
+    .lb-rank.gold   { color: #ffd700; }
+    .lb-rank.silver { color: #c0c0c0; }
+    .lb-rank.bronze { color: #cd7f32; }
+
+    .lb-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+    }
+
+    .lb-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .lb-score {
+      text-align: right;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* ── CTA Banner ── */
+    .cta-banner {
+      padding: 100px 0;
+      text-align: center;
+    }
+
+    .cta-banner h2 {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 900;
+      margin-bottom: 16px;
+    }
+
+    .cta-banner p {
+      color: #6060a0;
+      margin-bottom: 40px;
+      font-size: 1.1rem;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: gap;
+      gap: 16px;
+    }
+
+    footer .logo { font-size: 1.2rem; }
+
+    footer p {
+      color: #4040a0;
+      font-size: 0.85rem;
+    }
+
+    .footer-links a {
+      color: #4040a0;
+      text-decoration: none;
+      margin-left: 20px;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--primary); }
+
+    @media (max-width: 600px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      footer { flex-direction: column; text-align: center; }
+      .footer-links a { margin: 0 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Animated background blobs -->
+<div class="bg-canvas" id="bgCanvas"></div>
+
+<!-- Nav -->
+<nav>
+  <div class="logo">blob.io</div>
+  <div class="nav-links">
+    <a href="#">How to Play</a>
+    <a href="#">Leaderboard</a>
+    <a href="#">About</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <div class="badge">Now Live &nbsp;·&nbsp; 12,400 players online</div>
+      <h1>Eat.<br /><span>Grow.</span><br />Dominate.</h1>
+      <p>
+        Jump into a massive multiplayer arena and consume everything smaller
+        than you. Outmaneuver rivals, grow your blob, and climb to the top of
+        the global leaderboard — no download required.
+      </p>
+      <div class="cta-group">
+        <a href="#" class="btn btn-primary">Play Now — Free</a>
+        <a href="#" class="btn btn-outline">Watch Trailer</a>
+      </div>
+
+      <div class="stats">
+        <div class="stat-item">
+          <strong>2M+</strong>
+          <span>Players</span>
+        </div>
+        <div class="stat-item">
+          <strong>50+</strong>
+          <span>Arenas</span>
+        </div>
+        <div class="stat-item">
+          <strong>#1</strong>
+          <span>Browser Game</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features">
+  <div class="container">
+    <h2 class="section-title">Why players love blob.io</h2>
+    <p class="section-sub">Simple to learn, impossible to put down.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Instant Play</h3>
+        <p>No sign-up, no download. Open the page and you're in the arena within seconds.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌐</div>
+        <h3>Global Servers</h3>
+        <p>Low-latency servers across 6 continents ensure silky-smooth gameplay wherever you are.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>Custom Skins</h3>
+        <p>Unlock hundreds of skins and make your blob stand out in a sea of rivals.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏆</div>
+        <h3>Live Leaderboards</h3>
+        <p>Real-time rankings updated every second. Can you reach the #1 spot?</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👥</div>
+        <h3>Team Mode</h3>
+        <p>Squad up with friends and dominate the arena together as a coordinated team.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>Mobile Ready</h3>
+        <p>Fully playable on any device — desktop, tablet, or phone, portrait or landscape.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How to Play -->
+<section class="how-to-play">
+  <div class="container">
+    <h2 class="section-title">How to Play</h2>
+    <p class="section-sub">Master the basics in under a minute.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Enter the Arena</h3>
+        <p>Pick a nickname and choose your starting skin, then dive into a live server.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Consume &amp; Grow</h3>
+        <p>Move your blob over food pellets and smaller players to absorb their mass.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Split &amp; Dodge</h3>
+        <p>Split your blob to catch prey or escape larger enemies — timing is everything.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>Rule the Board</h3>
+        <p>Reach the top of the leaderboard and hold your position as long as you can.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Leaderboard Preview -->
+<section class="leaderboard-section">
+  <div class="container">
+    <h2 class="section-title">Top Players Right Now</h2>
+    <p class="section-sub">Updated live — is your name up here?</p>
+
+    <div class="leaderboard">
+      <div class="lb-header">
+        <span>#</span><span>Player</span><span>Score</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank gold">1</span>
+        <span class="lb-name"><span class="lb-dot" style="background:#ff6b6b"></span>xX_BlobKing_Xx</span>
+        <span class="lb-score">148,320</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank silver">2</span>
+        <span class="lb-name"><span class="lb-dot" style="background:#a78bfa"></span>NeonPulse</span>
+        <span class="lb-score">127,880</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank bronze">3</span>
+        <span class="lb-name"><span class="lb-dot" style="background:#34d399"></span>Devour3r</span>
+        <span class="lb-score">119,450</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank">4</span>
+        <span class="lb-name"><span class="lb-dot" style="background:#fbbf24"></span>GigaCell</span>
+        <span class="lb-score">98,770</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank">5</span>
+        <span class="lb-name"><span class="lb-dot" style="background:#38bdf8"></span>SlimeSurfer</span>
+        <span class="lb-score">87,120</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Banner -->
+<section class="cta-banner">
+  <div class="container">
+    <h2>Ready to <span style="background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">dominate</span> the arena?</h2>
+    <p>12,400 players are competing right now. Join the chaos — it's free.</p>
+    <a href="#" class="btn btn-primary" style="font-size:1.15rem;padding:18px 48px;">Play blob.io Free</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="logo">blob.io</div>
+  <p>&copy; 2026 blob.io. All rights reserved.</p>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+
+<script>
+  // Generate floating background blobs
+  const canvas = document.getElementById('bgCanvas');
+  const colors = ['#00e5ff', '#ff4081', '#a78bfa', '#34d399', '#fbbf24', '#38bdf8'];
+
+  for (let i = 0; i < 18; i++) {
+    const el = document.createElement('div');
+    el.classList.add('blob');
+    const size = Math.random() * 160 + 40;
+    el.style.cssText = `
+      width: ${size}px;
+      height: ${size}px;
+      left: ${Math.random() * 100}%;
+      background: ${colors[Math.floor(Math.random() * colors.length)]};
+      animation-duration: ${Math.random() * 20 + 15}s;
+      animation-delay: -${Math.random() * 30}s;
+    `;
+    canvas.appendChild(el);
+  }
+</script>
+</body>
+</html>
